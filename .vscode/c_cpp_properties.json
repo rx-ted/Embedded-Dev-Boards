@@ -1,0 +1,25 @@
+{
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "Drivers/stm32f1xx-hal-driver/Inc",
+        "Drivers/stm32f1xx-hal-driver/Inc/Legacy",
+        "Drivers/CMSIS/Device/cmsis-device-f1/Include",
+        "Drivers/CMSIS/Include",
+        "BSP/stm32f103/00Template/Core/Inc",
+        "BSP/stm32f103/00Template",
+        "BSP/stm32f103/00Template/System",
+        "BSP/stm32f103/00Template/HW"
+      ],
+      "defines": [
+        "USE_HAL_DRIVER",
+        "STM32F103xB"
+      ],
+      "cStandard": "c99",
+      "cppStandard": "c++11",
+      "intelliSenseMode": "gcc-arm"
+    }
+  ],
+  "version": 4
+}

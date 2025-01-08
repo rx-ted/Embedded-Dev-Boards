@@ -1,0 +1,12 @@
+.vscode/compile_commands.json
+.vscode/settings.json
+*.o
+*.lst
+*.list
+*.map
+output
+build
+compile_commands.json
+.cache
+.doc
+.xmake 

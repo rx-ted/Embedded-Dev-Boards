@@ -1,0 +1,38 @@
+version: 1.0.0
+
+
+boards:
+  - stm32
+  - gd32
+
+stm32:
+  company_name: STMicroelectronics
+  driver_names:
+    - stm32c0
+    - stm32f0
+    - stm32f1 # stm32f1xx-hal-driver
+    - stm32f2
+    - stm32f3
+    - stm32f4
+    - stm32f7
+    - stm32h5
+    - stm32h7
+    - stm32h7rs
+    - stm32g0
+    - stm32g4
+    - stm32l0
+    - stm32l1
+    - stm32l4
+    - stm32l5
+    - stm32u0
+    - stm32u5
+    - stm32wb
+    - stm32wb0
+    - stm32wba
+    - stm32wl
+    - stm32wl3
+gd32:
+  company_name: GD
+  driver_names:
+    - gd32f1
+    - gd32f4
