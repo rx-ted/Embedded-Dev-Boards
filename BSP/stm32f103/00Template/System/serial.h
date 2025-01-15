@@ -8,7 +8,7 @@ extern "C"
 
 #include "config.h"
 
-    device_result_t usart_init(uint8_t serial);
+    device_result_code_t usart_init(uint8_t serial);
 
 #ifdef __cplusplus
 }
