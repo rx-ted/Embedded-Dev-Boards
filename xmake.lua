@@ -22,6 +22,7 @@ set_symbols("debug")
 set_warnings('all')
 
 on_config(function(target)
+
     local path = string.format("%s/app.lua", app_dir)
     if not os.exists(path) then
         cprint(string.format(
@@ -31,38 +32,23 @@ on_config(function(target)
     end
 
     local import_configs = import('Tools.utils.config')
+    -- add object to import_configs
     import_configs.set_config('target', target)
     import_configs.set_config('app', import(string.format('BSP.%s.%s.app', board_name, project_name)))
     import_configs.set_config('utils', import('Tools.utils.utils'))
     import_configs.set_config('search', import('Tools.utils.search'))
+    -- get all configs
     configs = import_configs.get_configs()
-    configs.app.set_user_config('board_name', board_name)
-    configs.app.set_user_config('project_name', project_name)
-    local user_config = configs.app.get_user_config()
-    local is_valid, error_message = configs.utils.validate_config(user_config)
-    if not is_valid then
-        print(error_message)
-        os.exit(1)
-    end
+    -- set user_config to  import_configs
+    import_configs.set_config('user_config', configs.app.get_user_config())
+
+    configs.utils.parsingUserConfig(configs)
+
     -- ignore flag
     target:set('policy', "check.auto_ignore_flags", false)
     target:set('targetdir', target_dir)
     target:set('filename', project_name .. '.elf')
-    target:add('ldflags', "-specs=nano.specs",
-        string.format("-T%s -lc -lm -lnosys -Wl,-Map=%s/%s.map,--cref -Wl,--gc-sections", user_config.ld_file,
-            target_dir, project_name))
-    target:add('files', user_config.asm_file)
 
-    for i, v in ipairs(user_config.defines) do
-        target:add('defines', v)
-        configs.search.check_driver(configs, v)
-    end
-    if not configs.utils.getIncludeDirsAndFiles(target, {app_dir .. "/**"}) then
-        os.exit(1)
-    end
-    for i, v in ipairs(user_config.remove_files) do
-        target:remove('files', v)
-    end
 end)
 
 -- 构建完成后的回调函数
@@ -92,7 +78,7 @@ after_build(function(target)
 end)
 
 on_run(function(target)
-    local openocd = configs.app.get_user_config().openocd
+    local openocd = configs.openocd
     if openocd.interface_name == nil or openocd.target_name == nil or openocd.options == nil then
         cprint(
             string.format("${bright red onwhite}Error: Please verify the interface_name and target_name for OpenOCD!"))

@@ -8,9 +8,10 @@
         "Drivers/CMSIS/Device/cmsis-device-f1/Include",
         "Drivers/CMSIS/Include",
         "BSP/stm32f103/00Template/Core/Inc",
-        "BSP/stm32f103/00Template",
         "BSP/stm32f103/00Template/System",
-        "BSP/stm32f103/00Template/HW"
+        "BSP/stm32f103/00Template/HW",
+        "Middlewares/lcd/ssd1306",
+        "Middlewares/malloc"
       ],
       "defines": [
         "USE_HAL_DRIVER",

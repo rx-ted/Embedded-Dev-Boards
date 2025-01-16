@@ -1,54 +1,3 @@
-local default_config_schema = {
-    board_name = {
-        type = "string"
-    },
-    project_name = {
-        type = "string"
-    },
-    defines = {
-        type = 'table',
-        default = {}
-    },
-    asm_file = {
-        type = "string"
-    },
-    ld_file = {
-        type = "string"
-    },
-    remove_files = {
-        type = 'table',
-        default = {}
-    },
-    opennocd = {
-        type = 'table',
-        default = {}
-    }
-}
-
-function validate_config(user_config)
-    local errors = {}
-
-    for key, schema in pairs(default_config_schema) do
-        local user_value = user_config[key]
-        if user_value == nil then
-            if schema.default == nil then
-                table.insert(errors, string.format("Missing required key '%s'", key))
-            else
-                user_config[key] = schema.default
-            end
-        elseif type(user_value) ~= schema.type then
-            table.insert(errors, string.format("Invalid type for key '%s', expected %s", key, schema.type))
-        elseif schema.type ~= type(user_value) then
-            table.insert(errors, string.format("Invalid type for key '%s', expected an array", key))
-        end
-    end
-    if #errors > 0 then
-        return false, table.concat(errors, "; ")
-    else
-        return true
-    end
-end
-
 function getIncludeDirsAndFiles(target, match_dirs)
     if type(match_dirs) ~= 'table' then
         print("Error: 'match_dirs' should be a table")
@@ -83,4 +32,86 @@ function getIncludeDirsAndFiles(target, match_dirs)
         end
     end
     return true
+end
+
+---@param match_dirs string[]|any
+local function traverse_header_dirs(match_dirs)
+    if type(match_dirs) ~= 'table' then
+        print("Error: 'match_dirs' should be a table")
+        return nil
+    end
+    local collect_dirs = {}
+    for _, dirs in ipairs(match_dirs) do
+        for _, file in ipairs(os.files(dirs .. '/*.h')) do
+            table.insert(collect_dirs, dirs)
+            break
+        end
+    end
+    return collect_dirs
+end
+
+---@param match_dirs string[]|any
+---@return string[]|nil
+local function traverse_dirs(match_dirs)
+    if type(match_dirs) ~= 'table' then
+        print("Error: 'match_dirs' should be a table")
+        return nil
+    end
+    local collect_dirs = {}
+    for _, dirs in ipairs(match_dirs) do
+        for _, dir in ipairs(os.dirs(dirs)) do
+            table.insert(collect_dirs, dir)
+        end
+    end
+    return collect_dirs
+end
+
+---@param user_config MyConfig
+function parsingUserConfig(configs, user_config)
+    local target = configs.target
+    local user_config = configs.app.get_user_config()
+
+    if user_config.asm_file then
+        target:add('files', user_config.asm_file)
+    end
+    if user_config.c_files then
+        for _, file in ipairs(user_config.c_files) do
+            target:add('files', file)
+        end
+    end
+    if user_config.cc_files then
+        for _, file in ipairs(user_config.cc_files) do
+            target:add('files', file)
+        end
+    end
+    if user_config.remove_files then
+        for _, file in ipairs(user_config.remove_files) do
+            target:remove('files', file)
+        end
+    end
+    if user_config.defines then
+        for _, definition in ipairs(user_config.defines) do
+            target:add('defines', definition)
+            configs.search.check_driver(configs, definition)
+        end
+    end
+    if user_config.board_name and user_config.project_name and user_config.ld_file then
+        target:add('ldflags', "-specs=nano.specs",
+            string.format("-T%s -lc -lm -lnosys -Wl,-Map=%s/%s.map,--cref -Wl,--gc-sections", user_config.ld_file,
+                'BSP/' .. user_config.board_name .. '/' .. user_config.project_name .. '/Output',
+                user_config.project_name))
+    end
+    if user_config.header_dirs then
+        local dirs = traverse_header_dirs(traverse_dirs(user_config.header_dirs))
+        if dirs ~= nil then
+            for _, dir in ipairs(dirs) do
+                target:add('includedirs', dir)
+            end
+        end
+    end
+
+    if user_config.openocd then
+        configs.openocd = user_config.openocd
+    end
+
 end

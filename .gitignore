@@ -9,7 +9,7 @@ build
 compile_commands.json
 .cache
 .doc
-.xmake 
+.xmake
 # Prerequisites
 *.d
 

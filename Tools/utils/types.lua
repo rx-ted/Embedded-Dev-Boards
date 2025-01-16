@@ -1,0 +1,19 @@
+---@author: rx-ted
+-- openocd config
+---@class OpenOCDConfig
+---@field interface_name string `interface board name`
+---@field target_name string  `specifies the target configuration file for the board`
+---@field options string `other option, For example: "-c 'cmsis_dap_backend hid' -c 'transport select swd"`
+
+-- my config
+---@class MyConfig
+---@field board_name string `Current board name`
+---@field project_name string `Current project name`
+---@field defines string[] `Add macro definition`
+---@field asm_file string `Add ASM file`
+---@field ld_file string `Add linker file`
+---@field remove_files string[] `Remove source files`
+---@field openocd OpenOCDConfig `Openocd configuration`
+---@field c_files string[] `Add source files`
+---@field cc_files string[] `Add source files`
+---@field header_dirs string[] `Add include search directories`
