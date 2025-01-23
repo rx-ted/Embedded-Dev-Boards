@@ -3,6 +3,15 @@ local dirs = {}
 local MCU
 local FLAGS
 
+local function setLVGLConfig()
+    local lvgl_config = {}
+    lvgl_config.dirs = {"Middlewares/lvgl", "Middlewares/lvgl/examples", "Middlewares/lvgl/demos"}
+
+    lvgl_config.files =
+        {"Middlewares/lvgl/src/**/*.c", "Middlewares/lvgl/demos/**/*.c", "Middlewares/lvgl/examples/*.c"}
+    return lvgl_config
+end
+
 local board_configs = {
     stm32 = {
         f1 = {"STM32F100xB", "STM32F100xE", "STM32F101x6", "STM32F101xB", "STM32F101xE", "STM32F101xG", "STM32F102x6",
@@ -69,7 +78,7 @@ local function set_stm32f1_config()
     'Drivers/CMSIS/Device/cmsis-device-f1/**', -- add cmsis device
     'Drivers/CMSIS/Include/**' -- default cmsis include directory
     }
-    MCU = "-mcpu=cortex-m3 -mthumb" 
+    MCU = "-mcpu=cortex-m3 -mthumb"
     FLAGS = "-gdwarf-2 -fdata-sections -ffunction-sections"
 end
 
@@ -77,6 +86,15 @@ function check_driver(configs, name)
     target = configs.target
     local board_info = find_board_info(name)
     if board_info == nil then
+        if name == 'BSP_USING_LVGL=1' then
+            local lvgl_config = setLVGLConfig()
+            for _, v in ipairs(lvgl_config.dirs) do
+                target:add('includedirs', v)
+            end
+            for _, v in ipairs(lvgl_config.files) do
+                target:add('files', v)
+            end
+        end
         return
     end
 

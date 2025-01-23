@@ -107,6 +107,8 @@ function parsingUserConfig(configs, user_config)
             for _, dir in ipairs(dirs) do
                 target:add('includedirs', dir)
             end
+        else
+            print('Not found '.. dirs)
         end
     end
 

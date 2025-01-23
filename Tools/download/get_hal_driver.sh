@@ -1,14 +1,10 @@
 #!/bin/bash
 
-if [ -n "$Embedded_Dev_Boards_PATH" ]; then
-    HOME_PATH="$Embedded_Dev_Boards_PATH"
-else
-    HOME_PATH="../.."
-fi
+source ../add_path.sh
 
-REPOSITORY_YAML_FILE=$(find "$HOME_PATH" -name "respository.yaml" -print -quit)
+REPOSITORY_YAML_FILE=$(find "$Embedded_Dev_Boards_PATH" -name "repository.yaml" -print -quit)
 if [ -z "$REPOSITORY_YAML_FILE" ]; then
-    echo 'respository.txt file is not found!'
+    echo 'repository.txt file is not found!'
     exit 1
 fi
 
@@ -51,13 +47,13 @@ get_str_diff() {
         local shorter="$1"
     fi
 
-    if [[ "$longer" == "$shorter"* ]]; then 
-    local stuffix="${longer#$shorter}"
+    if [[ "$longer" == "$shorter"* ]]; then
+        local suffix="${longer#$shorter}"
     fi
-    if [ -z "$stuffix" ]; then 
+    if [ -z "$suffix" ]; then
         exit 1
     fi
-    echo "$stuffix"
+    echo "$suffix"
 
 }
 
@@ -65,12 +61,12 @@ download_repo() {
     url_prefix="https://dgithub.xyz"
     url_stuffix=$1"xx-hal-driver"
     url=$(echo $url_prefix/$2/$url_stuffix.git | tr -d '"')
-    echo "Clone $url to $HOME_PATH/Drivers/$url_stuffix"
-    $(git clone $url $HOME_PATH/Drivers/$url_stuffix)
-    url_stuffix1="cmsis-device-"$(get_str_diff "$3" $1)
-    url1=$(echo $url_prefix/$2/$url_stuffix1.git | tr -d '"')
-    echo "Clone $url1 to $HOME_PATH/Drivers/CMSIS/Device/$url_stuffix1"
-    $(git clone $url1 $HOME_PATH/Drivers/CMSIS/Device/$url_stuffix1)
+    echo "Clone $url to $Embedded_Dev_Boards_PATH/Drivers/$url_stuffix"
+    $(git clone $url $Embedded_Dev_Boards_PATH/Drivers/$url_stuffix)
+    url_suffix1="cmsis-device-"$(get_str_diff "$3" $1)
+    url1=$(echo $url_prefix/$2/$url_suffix1.git | tr -d '"')
+    echo "Clone $url1 to $Embedded_Dev_Boards_PATH/Drivers/CMSIS/Device/$url_suffix1"
+    $(git clone $url1 $Embedded_Dev_Boards_PATH/Drivers/CMSIS/Device/$url_suffix1)
 }
 
 user_input=${1:-""}
